@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . "/../vendor/autoload.php";
+
 class WikiMarkdown {
 
 	/** @var string CSS class for markdown code. */
@@ -72,7 +74,7 @@ class WikiMarkdown {
 		$refers = [];
 		$out = preg_replace_callback(
 			'/<h([1-6])(\s+id="(.*)")?>(.*)<\/h\1>/isU',
-			function ($matches) use (&$refers) {
+			function ($matches) use (&$refers, $parser) {
 				// Create an anchor id from the heading text or id (if found)
 				$anchor = 'markdown_' . (empty($matches[2]) ? Sanitizer::escapeIdForAttribute($matches[4]) : html_entity_decode($matches[3]));
 				// Ensure that anchors are unique
@@ -83,7 +85,7 @@ class WikiMarkdown {
 				} else {
 					$refers[$anchor] = true;
 				}
-				return Linker::makeHeadline($matches[1], '>', $anchor, $matches[4], '');
+					return '<h' . $matches[1] . ' id="' . $anchor . '">' . $matches[4] . '</h' . $matches[1] . '>';
 			},
 			$out
 		);
